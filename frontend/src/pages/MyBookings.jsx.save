@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import API from "../services/api";
 
 function MyBookings() {
@@ -6,7 +6,7 @@ function MyBookings() {
 
   const token = localStorage.getItem("token");
 
-  const load = useCallback(async () => {
+  const load = async () => {
     try {
       const response = await API.get(
         "/booking/my",
@@ -18,17 +18,14 @@ function MyBookings() {
       );
 
       setBookings(response.data);
-
     } catch (error) {
       console.log(error);
     }
-  }, [token]);
-
+  };
 
   useEffect(() => {
     load();
-  }, [load]);
-
+  }, []);
 
   const cancel = async (id) => {
     try {
@@ -45,7 +42,6 @@ function MyBookings() {
       alert("Ticket Cancelled");
 
       load();
-
     } catch (error) {
       console.log(error);
 
@@ -53,31 +49,27 @@ function MyBookings() {
     }
   };
 
-
   return (
     <div className="container">
       <div className="card">
-
         <h1>My Tickets 🎫</h1>
 
         {bookings.length === 0 ? (
           <p>No bookings found</p>
         ) : (
-
           bookings.map((booking) => (
-
             <div
               className="profile-item"
               key={booking._id}
             >
-
               <h3>
                 PNR: {booking.pnr || booking._id}
               </h3>
 
               <p>
                 Status:{" "}
-                {booking.bookingStatus || "CONFIRMED"}
+                {booking.bookingStatus ||
+                  "CONFIRMED"}
               </p>
 
               <p>
@@ -85,9 +77,8 @@ function MyBookings() {
                 {booking.passengers?.length}
               </p>
 
-
-              {booking.bookingStatus !== "Cancelled" && (
-
+              {booking.bookingStatus !==
+                "Cancelled" && (
                 <button
                   onClick={() =>
                     cancel(booking._id)
@@ -95,15 +86,10 @@ function MyBookings() {
                 >
                   Cancel Ticket
                 </button>
-
               )}
-
             </div>
-
           ))
-
         )}
-
       </div>
     </div>
   );
