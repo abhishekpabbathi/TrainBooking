@@ -1,0 +1,98 @@
+import { useEffect, useState } from "react";
+import API from "../services/api";
+
+function MyBookings() {
+  const [bookings, setBookings] = useState([]);
+
+  const token = localStorage.getItem("token");
+
+  const load = async () => {
+    try {
+      const response = await API.get(
+        "/booking/my",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setBookings(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const cancel = async (id) => {
+    try {
+      await API.put(
+        `/booking/cancel/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Ticket Cancelled");
+
+      load();
+    } catch (error) {
+      console.log(error);
+
+      alert("Cancel failed");
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="card">
+        <h1>My Tickets 🎫</h1>
+
+        {bookings.length === 0 ? (
+          <p>No bookings found</p>
+        ) : (
+          bookings.map((booking) => (
+            <div
+              className="profile-item"
+              key={booking._id}
+            >
+              <h3>
+                PNR: {booking.pnr || booking._id}
+              </h3>
+
+              <p>
+                Status:{" "}
+                {booking.bookingStatus ||
+                  "CONFIRMED"}
+              </p>
+
+              <p>
+                Passenger Count:{" "}
+                {booking.passengers?.length}
+              </p>
+
+              {booking.bookingStatus !==
+                "Cancelled" && (
+                <button
+                  onClick={() =>
+                    cancel(booking._id)
+                  }
+                >
+                  Cancel Ticket
+                </button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default MyBookings;
